@@ -306,6 +306,8 @@ explainToken token =
     T.Atom atom   -> "parse error: unexpected atom: `" ++ Text.unpack atom ++ "`"
     T.String str  -> "parse error: unexpected string: " ++ show (Text.unpack str)
     T.Bullet      -> "parse error: unexpected bullet '*'"
+    T.Plus        -> "parse error: unexpected plus '+'"
+    T.Dash        -> "parse error: unexpected dash '-'"
     T.Comma       -> "parse error: unexpected comma ','"
     T.Section s   -> "parse error: unexpected section: `" ++ Text.unpack s ++ "`"
     T.Number{}    -> "parse error: unexpected number"

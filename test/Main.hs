@@ -25,6 +25,16 @@ parseTest expected txts =
     Right v ->
       unless ((() <$ v) == expected) (fail (show (expected, () <$ v)))
 
+expectFailure ::
+  [Text]   {- ^ input lines    -} ->
+  IO ()
+expectFailure txts =
+    case parse txt of
+      Left _ -> pure ()
+      Right _ -> fail ("expected to fail but parse succeeded for: " <> Text.unpack txt)
+  where
+    txt = Text.unlines txts
+
 number :: Number -> Value ()
 number = Number ()
 
@@ -81,6 +91,21 @@ main = sequenceA_
   , parseTest (list [atom "x", list [atom "y", atom "z"]]) ["[x,[y,z]]"]
   , parseTest (list [atom "x", list [atom "y", atom "z"]]) ["* x", "* [y,z]"]
   , parseTest (list [atom "x", list [atom "y", atom "z"]]) ["* x", "* * y", "  * z"]
+
+  , parseTest (list [ atom "a"
+                    , list [ list [ atom "b"
+                                  , atom "c"]
+                           , list [ atom "d"
+                                  , atom "e" ]]])
+        [ "- a"
+        , "- + * b"
+        , "    * c"
+        , "  + * d"
+        , "    * e"
+        ]
+  , expectFailure [ "- a", "+ a"]
+  , expectFailure [ "- a", "* a"]
+  , expectFailure [ "+ a", "* a"]
 
   , parseTest (text "string") ["\"string\""]
   , parseTest (text "\10string\1\2") ["\"\\x0ast\\&r\\     \\ing\\SOH\\^B\""]

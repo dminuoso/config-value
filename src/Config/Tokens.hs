@@ -37,6 +37,8 @@ data Token
   | String Text
   | Atom Text
   | Bullet
+  | Dash
+  | Plus
   | Comma
   | Number Number
   | OpenList
@@ -97,7 +99,9 @@ toCol = posColumn . locPosition
 
 -- | Return True when a token starts a layout scope.
 usesLayout :: Located Token -> Bool
-usesLayout t
-  | Section{} <- locThing t = True
-  | Bullet    <- locThing t = True
-  | otherwise               = False
+usesLayout t = case locThing t of
+  Section{} -> True
+  Bullet    -> True
+  Plus      -> True
+  Dash      -> True
+  _         -> False
